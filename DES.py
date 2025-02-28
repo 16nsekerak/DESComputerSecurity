@@ -210,7 +210,7 @@ def generate_subkeys(key64bits):
         # PC-2 => 48 bits
         CD = C + D
         K_i = permute(CD, PC2)
-        print(f"K{15-round_i:2} = {''.join(map(str, K_i))}")
+        print(f"Key{15-round_i:2} = {''.join(map(str, K_i))}")
         subkeys.append(K_i)
     return subkeys[::-1] # return the reversed key order to decrypt
 
@@ -228,7 +228,7 @@ def des_decrypt_block(cipher64bits, subkeys):
 
         key_str = "".join(str(x) for x in round_key)
         f_str =  "".join(str(x) for x in f_out)
-        print(f"Round {i+1} uses K_{i}: {key_str}")
+        print(f"Round {i+1}")
         print(f"  f(R_{i}, K_{i}) = {f_str}")
 
         # Feistel
@@ -238,7 +238,6 @@ def des_decrypt_block(cipher64bits, subkeys):
 
         print(f"  L_{i+1} = {''.join(map(str, L))}")
         print(f"  R_{i+1} = {''.join(map(str, R))}")
-        print("-"*68)
 
     preoutput = R + L
     plain64bits = permute(preoutput, FP)
@@ -251,21 +250,17 @@ def main():
     key_bytes = key_str.encode("ascii")  # 8 bytes
     ciphertext_binstr = "1100101011101101101000100110010101011111101101110011100001110011"
 
-    print(f"Cipher text (binary): {ciphertext_binstr}")
-    print(f"key (text): LOVECSND")
-    print("\n" + "="*68 + "\n")
-
     ciphertext_block = binstr_to_bytes(ciphertext_binstr)
 
     key_bits_64 = bytes_to_bitlist(key_bytes)
-    print("Generate the Keys")
+    print("16 Keys:")
     subkeys_enc = generate_subkeys(key_bits_64)  # K1..K16 (in reverse order)
-    print("\n" + "="*68 + "\n")
+   
     
     ct_bits_64 = bytes_to_bitlist(ciphertext_block)
-    print("Decode the block in 16 rounds as follows:\n")
+    print("\nDecode\n")
     plaintext_bits_64 = des_decrypt_block(ct_bits_64, subkeys_enc)
-    print(f"\nPlaintext = {''.join(map(str, plaintext_bits_64))}")
+    print(f"\nPlaintext (binary) = {''.join(map(str, plaintext_bits_64))}")
 
     # Convert the resulting 64 bits into ASCII
     plaintext_block = bitlist_to_bytes(plaintext_bits_64)
